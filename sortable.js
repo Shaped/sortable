@@ -1,28 +1,24 @@
+/*
+	sortable - easy sortable tables [compwnents]
+	(C) 2021 Shaped Technica (Jai B) || GPLv3 | Commercial License Available
+*/
+
 class Sortable {
     constructor() {
-    	this.tables=[];
+    	this.lastSort=null;
     }
 
     initialize() {
     	Array.from(document.querySelectorAll("table")).forEach((tableElement,tableId)=>{
     		if (tableElement.classList.contains('sortable')) {
-				this.tables[tableId] = {
-					element: tableElement,
-					headers: [],
-					columns: []
-				};
-
 				this.sortTable(tableElement, 0);
+		
+				tableElement.rows[0].cells[0].classList.add('sortable_active');
+				tableElement.rows[0].cells[0].classList.add('sortable_asc');
 
 	    		Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId)=>{
 					Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId)=>{
-						if (rowId == 0) {
-							this.tables[tableId].headers.push(tableCellElement.innerHTML);
-							tableCellElement.addEventListener('click', this.sortListener.bind(this));
-						} else {
-							if (rowId == 1) this.tables[tableId].columns[columnId] = [];
-							this.tables[tableId].columns[columnId].push(tableCellElement.innerHTML);
-						}
+						if (rowId == 0) tableCellElement.addEventListener('click', this.sortListener.bind(this));
 		    		});
 	    		});
     		}
@@ -37,16 +33,27 @@ class Sortable {
 			table = ev.target.parentElement.parentElement;
 		}
 
-		switch (table.sortDirection) {
-			case 0:
-				table.sortDirection = 1;
-			break;
-			case 1:
+		if (this.lastSort == ev.target.cellIndex) {
+			switch (table.sortDirection) {
+				case 0:
+					table.sortDirection = 1;
+				  break;
+				case 1:
+					table.sortDirection = 0;
+				  break;
+				case null:
+				default:
+					table.sortDirection = 0;
+			}
+		} else {
+			if (this.lastSort != null) {
+				console.log("last sort:")
+				console.log(this.lastSort)
+			} else {
+				console.log("nls");
 				table.sortDirection = 0;
-			break;
-			case null:
-			default:
-				table.sortDirection = 0;
+			}
+			this.lastSort = ev.target.cellIndex;
 		}
 
 		Array.from(table.querySelectorAll('.sortable_active')).forEach((el, i)=> {
@@ -56,6 +63,8 @@ class Sortable {
 		});
 
 		table.rows[0].cells[ev.target.cellIndex].classList.add('sortable_active');
+
+		console.log(table.sortDirection)
 
 		if (table.sortDirection)
 			table.rows[0].cells[ev.target.cellIndex].classList.add('sortable_asc');
@@ -73,21 +82,23 @@ class Sortable {
 	sortTable(table, comparisonIndex, comparisonFunction = function(x, y) {
 		return x.value > y.value;
 	}) {
-		console.log("sorting table")
-		console.log(table)
-		var rows,i,x,y;
-		var switching = true;
-		var shouldSwitch = false;
+		this.lastSort = comparisonIndex;
+		var rw,i,x,y;
+		var sw = true;
+		var ss = false;
 
-		while (switching) {
-			switching = false;
-			rows = table.rows;
+		if (typeof table.sortDirection === 'undefined')
+			table.sortDirection = 1;
 
-			for (i=1; i < rows.length - 1; i++) {
-				shouldSwitch = false;
+		while (sw) {
+			sw = false;
+			rw = table.rows;
 
-				x = rows[i].getElementsByTagName("td")[comparisonIndex];
-				y = rows[i+1].getElementsByTagName("td")[comparisonIndex];
+			for (i=1; i < rw.length - 1; i++) {
+				ss = false;
+
+				x = rw[i].getElementsByTagName("td")[comparisonIndex];
+				y = rw[i+1].getElementsByTagName("td")[comparisonIndex];
 
 				if (x.firstElementChild != null
 				&&	x.firstElementChild.tagName == 'input') {
@@ -104,13 +115,13 @@ class Sortable {
 				}
 
 				if (comparisonFunction(x, y)) {
-					shouldSwitch = true;
+					ss = true;
 					break;
 				}
 			}
-			if (shouldSwitch) {
-				rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-				switching = true;
+			if (ss) {
+				rw[i].parentNode.insertBefore(rw[i + 1], rw[i]);
+				sw = true;
 			}
 		}
 	}
