@@ -1,9 +1,6 @@
 table.sortable thead tr:first-child {
-	@include no-select;
+	user-select: none;	
 	cursor: pointer;
-}
-
-table td.sortable_active::before {
 }
 
 table td.sortable_asc::before {
