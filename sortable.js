@@ -5,7 +5,7 @@
 
 class Sortable {
     constructor() {
-    	this.lastSort=null;
+    	this.initialize();
     }
 
     initialize() {
@@ -33,7 +33,7 @@ class Sortable {
 			table = ev.target.parentElement.parentElement;
 		}
 
-		if (this.lastSort == ev.target.cellIndex) {
+		if (table.lastSort == ev.target.cellIndex) {
 			switch (table.sortDirection) {
 				case 0:
 					table.sortDirection = 1;
@@ -46,14 +46,9 @@ class Sortable {
 					table.sortDirection = 0;
 			}
 		} else {
-			if (this.lastSort != null) {
-				console.log("last sort:")
-				console.log(this.lastSort)
-			} else {
-				console.log("nls");
-				table.sortDirection = 0;
+			if (table.lastSort == null) {
+				table.sortDirection = 1;
 			}
-			this.lastSort = ev.target.cellIndex;
 		}
 
 		Array.from(table.querySelectorAll('.sortable_active')).forEach((el, i)=> {
@@ -63,8 +58,6 @@ class Sortable {
 		});
 
 		table.rows[0].cells[ev.target.cellIndex].classList.add('sortable_active');
-
-		console.log(table.sortDirection)
 
 		if (table.sortDirection)
 			table.rows[0].cells[ev.target.cellIndex].classList.add('sortable_asc');
@@ -82,7 +75,7 @@ class Sortable {
 	sortTable(table, comparisonIndex, comparisonFunction = function(x, y) {
 		return x.value > y.value;
 	}) {
-		this.lastSort = comparisonIndex;
+		table.lastSort = comparisonIndex;
 		var rw,i,x,y;
 		var sw = true;
 		var ss = false;

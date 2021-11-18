@@ -1,4 +1,4 @@
-keiboard-js is dual-licensed under comercial and open-source licenses. The commercial license gives you the full rights to use, create and redistriute the software on your own terms without any open source license obligations.
+sortable.js is dual-licensed under comercial and open-source licenses. The commercial license gives you the full rights to use, create and redistriute the software on your own terms without any open source license obligations.
 
 The open-source license option is GPLv3. This means any application using keiboard must be released open-source.
 
@@ -190,7 +190,7 @@ If you develop a new program, and you want it to be of the greatest possible use
 
 To do so, attach the following notices to the program. It is safest to attach them to the start of each source file to most effectively state the exclusion of warranty; and each file should have at least the “copyright” line and a pointer to where the full notice is found.
 
-    keiboard-js - on screen keyboard for kiosk/tablet applications
+    sortable.js - easy sortable tables
     Copyright (C) 2021 Jai B / Shaped Technologies / www.shaped.ca
 
     This program is free software: you can redistribute it and/or modify
