@@ -44,6 +44,8 @@ The classes 'sortable_active' and either 'sortable_asc' or 'sortable_desc' will 
 
 Custom sort functions are possible and you can activate a sort on any table whenever needed. **tableElement** is the documentElement of the table, **index** is the column index to sort by and **sortFunction** is a sort lambda/callback allowing you to implement your own sorting function.
 
+You can also pass your own custom function with the options on instantiation and it will be always used.
+
 eg:
 
     <script>
@@ -55,8 +57,3 @@ eg:
 					return (a < b);
       });
     </script>
-
-Currently there is no way to set a custom sort function for the automatically assigned event handlers, until this is added, if you need to use a custom sorting function then you can not set class 'sortable' on your table and handle the events yourself.
-
-### TODO:
-- add ability to pass custom sort function on instantiation.
