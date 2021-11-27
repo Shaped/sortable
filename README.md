@@ -57,3 +57,13 @@ eg:
 					return (a < b);
       });
     </script>
+
+Configuration object example:
+
+    let mySortable = new Sortable({
+        defaultSortDirection: 0,  // default to asc or desc
+	sortNumeric: true,        // whether to call parseInt() on the cell's value
+	sortByValue: false,       // if set to true, we will look at the value property of the first element instead of the innerHTML of the cell itself
+	tableClass: "sortable",   // specify the class on which to automatically sort and listen to events on table header for changing sort index and asc/desc
+	comparisonFunction = null // override the default comparison function for all tables
+    });
