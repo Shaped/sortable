@@ -1,6 +1,6 @@
 # sortable.js
 
-Easy sortable tables.
+Easy sortable tables. Updated now to be ~100x faster.
 
 Simply include sortable.js in your page, instantiate the class and add 'sortable' class to your table.
 
