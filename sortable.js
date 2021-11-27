@@ -18,7 +18,11 @@ class Sortable {
     		tableClass:tableClass,
     		comparisonFunction:comparisonFunction
     	};
-
+		this.sortEvent = new CustomEvent(`${this.options.tableClass}_sortEvent`, {
+			detail: {
+				table : null
+			}
+		});
     	this.initialize();
     }
 
@@ -108,6 +112,9 @@ class Sortable {
 		sortArray.sort(comparisonFunction);
 		sortArray.forEach((el,i) => sortedRows[i] = el.parentElement.cloneNode(true));
 
-		Array.from(table.rows).forEach((el,i) => (i > 0) ? el.replaceWith(sortedRows[i-1]) : null );		
+		Array.from(table.rows).forEach((el,i) => (i > 0) ? el.replaceWith(sortedRows[i-1]) : null );
+		
+		this.sortEvent.detail.table = table;
+		document.dispatchEvent(this.sortEvent);		
 	}
 }
