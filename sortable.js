@@ -6,6 +6,9 @@
 class Sortable {
     constructor() {
     	this.initialize();
+
+    	this.sortNumeric = true;
+    	this.sortValue = false;
     }
 
     initialize() {
@@ -32,6 +35,9 @@ class Sortable {
 		} else {
 			table = ev.target.parentElement.parentElement;
 		}
+
+		if (typeof table.sortDirection === 'undefined')
+			table.sortDirection = 1;
 
 		if (table.lastSort == ev.target.cellIndex) {
 			switch (table.sortDirection) {
@@ -64,58 +70,70 @@ class Sortable {
 		else
 			table.rows[0].cells[ev.target.cellIndex].classList.add('sortable_desc');
 
-		this.sortTable(table, ev.target.cellIndex, (x,y) => {
-			if (table.sortDirection)
-				return (x.value > y.value)
-			else
-				return (x.value < y.value)
-		});
+		this.sortTable(table, ev.target.cellIndex);
+
 	}
 
 	sortTable(table, comparisonIndex, comparisonFunction = function(x, y) {
-		return x.value > y.value;
-	}) {
+			if (table.sortDirection) {
+				if (this.sortNumeric
+				&& this.sortValue
+				&& typeof x.firstElementChild !== 'undefined'
+				&& typeof y.firstElementChild !== 'undefined') {
+					return parseInt(x.firstElementChild.value) > parseInt(y.firstElementChild.value)
+				} else
+
+				if (this.sortNumeric) {
+					if (isNaN(parseInt(x.innerHTML))
+					||  isNaN(parseInt(y.innerHTML))) {
+						return (x.innerHTML > y.innerHTML)						
+					}
+					return parseInt(x.innerHTML) > parseInt(y.innerHTML)
+				} else {
+					return (x.innerHTML > y.innerHTML)
+				}
+			} else {
+				if (this.sortNumeric
+				&& this.sortValue
+				&& typeof x.firstElementChild !== 'undefined'
+				&& typeof y.firstElementChild !== 'undefined') {
+					return parseInt(x.firstElementChild.value) < parseInt(y.firstElementChild.value)
+				} else
+
+				if (this.sortNumeric) {
+					if (isNaN(parseInt(x.innerHTML))
+					||  isNaN(parseInt(y.innerHTML))) {
+						return (x.innerHTML < y.innerHTML)						
+					}
+					return parseInt(x.innerHTML) < parseInt(y.innerHTML)
+				} else {
+					return (x.innerHTML < y.innerHTML)
+				}
+			}
+	}.bind(this)) {
 		table.lastSort = comparisonIndex;
-		var rw,i,x,y;
-		var sw = true;
-		var ss = false;
 
-		if (typeof table.sortDirection === 'undefined')
-			table.sortDirection = 1;
 
-		while (sw) {
-			sw = false;
-			rw = table.rows;
+		var sortArray = [];
 
-			for (i=1; i < rw.length - 1; i++) {
-				ss = false;
+		var sortedRows = [];
 
-				x = rw[i].getElementsByTagName("td")[comparisonIndex];
-				y = rw[i+1].getElementsByTagName("td")[comparisonIndex];
-
-				if (x.firstElementChild != null
-				&&	x.firstElementChild.tagName == 'input') {
-					x.value = x.firstElementChild.value;
-				} else {
-					x.value = x.innerHTML;
-				}
-
-				if (y.firstElementChild != null
-				&&	y.firstElementChild.tagName == 'input') {
-					y.value = y.firstElementChild.value;
-				} else {
-					y.value = y.innerHTML;
-				}
-
-				if (comparisonFunction(x, y)) {
-					ss = true;
-					break;
-				}
+		Array.from(table.rows).forEach((el,i) => {
+			if (i > 0) {
+				sortArray[i] = el.cells[comparisonIndex];
 			}
-			if (ss) {
-				rw[i].parentNode.insertBefore(rw[i + 1], rw[i]);
-				sw = true;
+		});
+
+		sortArray.sort(comparisonFunction);
+
+		sortArray.forEach((el,i) => {
+			sortedRows[i] = el.parentElement.cloneNode(true);
+		});
+
+		Array.from(table.rows).forEach((el,i) => {
+			if (i > 0) {
+				el.replaceWith(sortedRows[i-1]);
 			}
-		}
+		});		
 	}
 }
