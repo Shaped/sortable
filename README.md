@@ -67,3 +67,5 @@ Configuration object example:
 	tableClass: "sortable",   // specify the class on which to automatically sort and listen to events on table header for changing sort index and asc/desc
 	comparisonFunction = null // override the default comparison function for all tables
     });
+
+😎
