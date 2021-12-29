@@ -1,6 +1,6 @@
 /*
 	sortable - easy sortable tables [compwnents]
-	(C) 2021 Shaped Technica (Jai B) || GPLv3 | Commercial License Available
+	(C) 2022 Shaped Technica (Jai B) || GPLv3 | Commercial License Available
 */
 
 class Sortable {
@@ -18,24 +18,25 @@ class Sortable {
     		tableClass:tableClass,
     		comparisonFunction:comparisonFunction
     	};
+
 		this.sortEvent = new CustomEvent(`${this.options.tableClass}_sortEvent`, {
-			detail: {
-				table : null
-			}
+			detail: { table : null }
 		});
+
     	this.initialize();
     }
 
     initialize() {
     	Array.from(document.querySelectorAll("table")).forEach((tableElement,tableId) => 
     		(tableElement.classList.contains('sortable')) ? (
+				(typeof tableElement.sortDirection === 'undefined') ? tableElement.sortDirection = this.options.defaultSortDirection : null,
 				this.sortTable(tableElement, 0),
 
 				tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_active`),
 
 				(this.options.defaultSortDirection) ?
-					tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_desc`) :
-					tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_asc`),
+					tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_asc`) :
+					tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_desc`),
 
 	    		Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId) =>
 					Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId) =>
@@ -72,23 +73,23 @@ class Sortable {
 		table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_active`);
 
 		(table.sortDirection) ?
-			table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_desc`) :
-			table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_asc`);
+			table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_asc`) :
+			table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_desc`);
 
 		this.sortTable(table, ev.target.cellIndex);
 	}
 
 	sortTable(table, comparisonIndex, comparisonFunction = function(x, y) {
-			if (table.sortDirection) {
+			if (!table.sortDirection) {
 				if (this.options.sortNumeric && this.options.sortByValue
 				&& typeof x.firstElementChild !== 'undefined'
 				&& typeof y.firstElementChild !== 'undefined')
 					return parseInt(x.firstElementChild.value) > parseInt(y.firstElementChild.value)
 				else if (this.options.sortNumeric) 
 					return (isNaN(parseInt(x.innerHTML)) ||  isNaN(parseInt(y.innerHTML))) ?
-						(x.innerHTML > y.innerHTML) :
+						(x.innerHTML.toUpperCase() > y.innerHTML.toUpperCase()) :
 						parseInt(x.innerHTML) > parseInt(y.innerHTML);
-				else return (x.innerHTML > y.innerHTML)
+				else return (x.innerHTML.toUpperCase() > y.innerHTML.toUpperCase())
 			} else {
 				if (this.options.sortNumeric && this.options.sortByValue
 				&& typeof x.firstElementChild !== 'undefined'
@@ -96,9 +97,9 @@ class Sortable {
 					return parseInt(x.firstElementChild.value) < parseInt(y.firstElementChild.value)
 				else if (this.options.sortNumeric)
 					return (isNaN(parseInt(x.innerHTML)) ||  isNaN(parseInt(y.innerHTML))) ?
-						(x.innerHTML < y.innerHTML) :
+						(x.innerHTML.toUpperCase() < y.innerHTML.toUpperCase()) :
 						parseInt(x.innerHTML) < parseInt(y.innerHTML);
-				else return (x.innerHTML < y.innerHTML)
+				else return (x.innerHTML.toUpperCase() < y.innerHTML.toUpperCase())
 			}
 	}.bind(this)) {
 		table.lastSort = comparisonIndex;
