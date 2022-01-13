@@ -68,4 +68,31 @@ Configuration object example:
 	comparisonFunction = null // override the default comparison function for all tables
     });
 
+Using React? Oh shit ... I'm sorry!
+
+Added the 'startSorting' method for this reason (and other potential uses) so that instead of Sortable automatically searching the DOM for any tables containing the appropriate class (and thus, if using React, potentially overwriting elements managed by React).
+
+If your table is within a React component, you can simply pass a ``ref`` to ``Sortable.startSorting()`` like below. Note that you probably don't want to call ``Sortable.initialize()`` anymore unless you have other tables not managed by React that you want to automatically have Sortable decorate.
+
+```
+const mySortable = new Sortable();
+
+class MyComponent extends React.Component {
+    constructor(props) {
+        super(props);
+        this.sortableRef = React.createRef();
+    }
+
+    componentDidMount() {
+        mySortable.startSorting(this.sortableRef.current);
+    }
+
+    render() {
+        return (<table ref={this.sortableRef}>
+                // .. your table here ..
+                </table>);
+    }
+}
+```
+
 😎
