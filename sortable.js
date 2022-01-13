@@ -26,24 +26,30 @@ class Sortable {
     	this.initialize();
     }
 
-    initialize() {
-    	Array.from(document.querySelectorAll("table")).forEach((tableElement,tableId) => 
-    		(tableElement.classList.contains('sortable')) ? (
-				(typeof tableElement.sortDirection === 'undefined') ? tableElement.sortDirection = this.options.defaultSortDirection : null,
-				this.sortTable(tableElement, 0),
+    initialize(table = null) {
+		Array.from(document.querySelectorAll("table")).forEach((tableElement,tableId) => 
+			(tableElement.classList.contains('sortable')) ? (
+				this.startSorting(tableElement)
+			):null);
+	}
 
-				tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_active`),
+	startSorting(tableElement) {
+		(typeof tableElement.sortDirection === 'undefined') 
+			? tableElement.sortDirection = this.options.defaultSortDirection : null,
 
-				(this.options.defaultSortDirection) ?
-					tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_asc`) :
-					tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_desc`),
+			this.sortTable(tableElement, 0),
 
-	    		Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId) =>
-					Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId) =>
-						(rowId == 0) ? tableCellElement.addEventListener('click', this.sortListener.bind(this)) : null
-					)
+			tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_active`),
+
+			(this.options.defaultSortDirection) ?
+				tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_asc`) :
+				tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_desc`),
+
+			Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId) =>
+				Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId) =>
+					(rowId == 0) ? tableCellElement.addEventListener('click', this.sortListener.bind(this)) : null
 				)
-    		):null);
+			)		
 	}
 
 	sortListener(ev) {
