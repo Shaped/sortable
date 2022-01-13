@@ -82,24 +82,24 @@ class Sortable {
 	sortTable(table, comparisonIndex, comparisonFunction = function(x, y) {
 			if (!table.sortDirection) {
 				if (this.options.sortNumeric && this.options.sortByValue
-				&& typeof x.firstElementChild !== 'undefined'
-				&& typeof y.firstElementChild !== 'undefined')
-					return parseInt(x.firstElementChild.value) > parseInt(y.firstElementChild.value)
+				&& typeof x.firstElementChild !== 'undefined' && x.firstElementChild != null
+				&& typeof y.firstElementChild !== 'undefined' && y.firstElementChild != null)
+					return (parseInt(x.firstElementChild.value) > parseInt(y.firstElementChild.value)) ? 1 : -1;
 				else if (this.options.sortNumeric) 
 					return (isNaN(parseInt(x.innerHTML)) ||  isNaN(parseInt(y.innerHTML))) ?
-						(x.innerHTML.toUpperCase() > y.innerHTML.toUpperCase()) :
-						parseInt(x.innerHTML) > parseInt(y.innerHTML);
-				else return (x.innerHTML.toUpperCase() > y.innerHTML.toUpperCase())
+						(x.innerHTML.toUpperCase() > y.innerHTML.toUpperCase()) ? 1 : -1
+						: parseInt(x.innerHTML) > parseInt(y.innerHTML) ? 1 : -1;
+				else return (x.innerHTML.toUpperCase() > y.innerHTML.toUpperCase()) ? 1 : -1;
 			} else {
 				if (this.options.sortNumeric && this.options.sortByValue
-				&& typeof x.firstElementChild !== 'undefined'
-				&& typeof y.firstElementChild !== 'undefined')
-					return parseInt(x.firstElementChild.value) < parseInt(y.firstElementChild.value)
+				&& typeof x.firstElementChild !== 'undefined' && x.firstElementChild != null
+				&& typeof y.firstElementChild !== 'undefined' && y.firstElementChild != null)
+					return (parseInt(x.firstElementChild.value) < parseInt(y.firstElementChild.value)) ? 1 : -1;
 				else if (this.options.sortNumeric)
-					return (isNaN(parseInt(x.innerHTML)) ||  isNaN(parseInt(y.innerHTML))) ?
-						(x.innerHTML.toUpperCase() < y.innerHTML.toUpperCase()) :
-						parseInt(x.innerHTML) < parseInt(y.innerHTML);
-				else return (x.innerHTML.toUpperCase() < y.innerHTML.toUpperCase())
+					return (isNaN(parseInt(x.innerHTML)) || isNaN(parseInt(y.innerHTML))) ?
+						(x.innerHTML.toUpperCase() < y.innerHTML.toUpperCase()) ? 1 : -1
+						: (parseInt(x.innerHTML) < parseInt(y.innerHTML)) ? 1 : -1;
+				else return (x.innerHTML.toUpperCase() < y.innerHTML.toUpperCase()) ? 1 : -1;
 			}
 	}.bind(this)) {
 		table.lastSort = comparisonIndex;
@@ -110,7 +110,8 @@ class Sortable {
 
 		(this.options.comparisonFunction != null) ? comparisonFunction = this.options.comparisonFunction : null;
 
-		sortArray.sort(comparisonFunction);
+		sortArray = sortArray.sort(comparisonFunction);
+
 		sortArray.forEach((el,i) => sortedRows[i] = el.parentElement.cloneNode(true));
 
 		Array.from(table.rows).forEach((el,i) => (i > 0) ? el.replaceWith(sortedRows[i-1]) : null );
