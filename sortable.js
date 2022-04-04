@@ -1,88 +1,143 @@
 /*
-	sortable - easy sortable tables [compwnents]
+	sortable b2242 - easy sortable tables [compwnents]
 	(C) 2022 Shaped Technica (Jai B) || GPLv3 | Commercial License Available
 */
 
 class Sortable {
-    constructor({
-    	defaultSortDirection = 0,
-    	sortNumeric = true,
-    	sortByValue = false,
-    	tableClass = "sortable",
-    	comparisonFunction = null    	
-    } = {}) {
-    	this.options = {
-    		defaultSortDirection:defaultSortDirection,
-    		sortNumeric:sortNumeric,
-    		sortByValue:sortByValue,
-    		tableClass:tableClass,
-    		comparisonFunction:comparisonFunction
-    	};
+	constructor({
+		defaultSortDirection = 0,
+		sortNumeric = true,
+		sortByValue = false,
+		tableClass = "sortable",
+		comparisonFunction = null    	
+	} = {}) {
+		this.options = {
+			defaultSortDirection:defaultSortDirection,
+			sortNumeric:sortNumeric,
+			sortByValue:sortByValue,
+			tableClass:tableClass,
+			comparisonFunction:comparisonFunction
+		};
 
 		this.sortEvent = new CustomEvent(`${this.options.tableClass}_sortEvent`, {
 			detail: { table : null }
 		});
 
-    	this.initialize();
-    }
+		this.initialize();
+	}
 
-    initialize(table = null) {
+	initialize(table = null) {
 		Array.from(document.querySelectorAll("table")).forEach((tableElement,tableId) => 
-			(tableElement.classList.contains('sortable')) ? (
+			(tableElement.classList.contains(this.options.tableClass)) ? (
 				this.startSorting(tableElement)
 			):null);
 	}
 
-	startSorting(tableElement) {
-		(typeof tableElement.sortDirection === 'undefined') 
-			? tableElement.sortDirection = this.options.defaultSortDirection : null,
+	startSorting(tableElement, index = 0) {
+		if (typeof tableElement.sortDirection === 'undefined') 
+			tableElement.sortDirection = this.options.defaultSortDirection;
 
-			this.sortTable(tableElement, 0),
+		tableElement.observer = new MutationObserver(this.update.bind(this, tableElement));
 
-			tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_active`),
+		if (!tableElement.classList.contains(this.options.tableClass)) tableElement.classList.add(this.options.tableClass);
 
-			(this.options.defaultSortDirection) ?
-				tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_asc`) :
-				tableElement.rows[0].cells[0].classList.add(`${this.options.tableClass}_desc`),
+		this.sortTable(tableElement, index);
 
-			Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId) =>
-				Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId) =>
-					(rowId == 0) ? tableCellElement.addEventListener('click', this.sortListener.bind(this)) : null
-				)
-			)		
+		tableElement.rows[0].cells[index].classList.add(`${this.options.tableClass}_active`);
+
+		(this.options.defaultSortDirection) ?
+			tableElement.rows[0].cells[index].classList.add(`${this.options.tableClass}_asc`) :
+			tableElement.rows[0].cells[index].classList.add(`${this.options.tableClass}_desc`);
+
+		Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId) => {
+			Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId) => {
+					(rowId == 0) ? tableCellElement.addEventListener('click', this.sortListener) : null;
+				}
+			)
+		});
 	}
 
-	sortListener(ev) {
-		let table = null;
-		(ev.target.parentElement.parentElement.tagName == "thead") ?
-			table = ev.target.parentElement.parentElement.parentElement :
-			table = ev.target.parentElement.parentElement;
+	stopSorting(tableElement = null) {
+		if (tableElement == null) {
+			Array.from(document.querySelectorAll("table"))
+				.forEach((tableElement,tableId) => {
+					if (tableElement.classList.contains(this.options.tableClass)) {
+							(typeof tableElement.observer !== 'undefined') ? tableElement.observer.disconnect():null;
 
-		(typeof table.sortDirection === 'undefined') ? table.sortDirection = this.options.defaultSortDirection : null;
+							tableElement.classList.remove(this.options.tableClass);
 
-		(table.lastSort == ev.target.cellIndex) ? (() => {
-				switch (table.sortDirection) {
-					case 0: table.sortDirection = 1; break;
-					case 1: table.sortDirection = 0; break;
-					case null:
-					default:
-					  table.sortDirection = this.options.defaultSortDirection;
-				}
-			})() :
-		 	(table.lastSort == null) ? table.sortDirection = this.options.defaultSortDirection : null;
-		
-		Array.from(table.querySelectorAll('.sortable_active')).forEach((el, i) =>
-			el.classList.remove(`${this.options.tableClass}_active`,
-								`${this.options.tableClass}_asc`,
-								`${this.options.tableClass}_desc`));
+							Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId) => 
+								(rowId == 0) 
+								?	Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId) => {
+										tableCellElement.classList.remove(`${this.options.tableClass}_asc`);
+										tableCellElement.classList.remove(`${this.options.tableClass}_desc`);
+										tableCellElement.classList.remove(`${this.options.tableClass}_active`);
 
-		table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_active`);
+										tableCellElement.removeEventListener('click', this.sortListener);
+									})
+								:null);
+					}
+				});
+		} else {
+			(typeof tableElement.observer !== 'undefined') ? tableElement.observer.disconnect() :null;
 
-		(table.sortDirection) ?
-			table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_asc`) :
-			table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_desc`);
+			tableElement.classList.remove(this.options.tableClass);
 
-		this.sortTable(table, ev.target.cellIndex);
+			Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId) =>
+				(rowId == 0)
+				?	Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId) => {
+						tableCellElement.classList.remove(`${this.options.tableClass}_asc`);
+						tableCellElement.classList.remove(`${this.options.tableClass}_desc`);
+						tableCellElement.classList.remove(`${this.options.tableClass}_active`);
+
+						tableCellElement.removeEventListener('click', this.sortListener);
+					})
+				:null);
+		}
+	}
+
+	update(element, mutations, observer) {
+		element.observer.disconnect();
+		this.sortTable(element, element?.lastSort);
+	}
+
+	get sortListener() {
+		const listener = (ev) => {
+			let table = null;
+			(ev.target.parentElement.parentElement.tagName == "thead") ?
+				table = ev.target.parentElement.parentElement.parentElement :
+				table = ev.target.parentElement.parentElement;
+
+			(typeof table.sortDirection === 'undefined') ? table.sortDirection = this.options.defaultSortDirection : null;
+
+			(table.lastSort == ev.target.cellIndex) ? (() => {
+					switch (table.sortDirection) {
+						case 0: table.sortDirection = 1; break;
+						case 1: table.sortDirection = 0; break;
+						case null:
+						default:
+						  table.sortDirection = this.options.defaultSortDirection;
+					}
+				})() :
+				(table.lastSort == null) ? table.sortDirection = this.options.defaultSortDirection : null;
+			
+			Array.from(table.querySelectorAll(`.${this.options.tableClass}_active`)).forEach((el, i) =>
+				el.classList.remove(`${this.options.tableClass}_active`,
+									`${this.options.tableClass}_asc`,
+									`${this.options.tableClass}_desc`));
+
+			table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_active`);
+
+			(table.sortDirection) ?
+				table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_asc`) :
+				table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_desc`);
+
+			this.sortTable(table, ev.target.cellIndex);
+		};
+
+		Object.defineProperty(this, 'sortListener',{ value : listener});
+
+	  return listener;
 	}
 
 	sortTable(table, comparisonIndex, comparisonFunction = function(x, y) {
@@ -108,6 +163,7 @@ class Sortable {
 				else return (x.innerHTML.toUpperCase() < y.innerHTML.toUpperCase()) ? 1 : -1;
 			}
 	}.bind(this)) {
+
 		table.lastSort = comparisonIndex;
 
 		var sortArray = [], sortedRows = [];
@@ -122,6 +178,11 @@ class Sortable {
 
 		Array.from(table.rows).forEach((el,i) => (i > 0) ? el.replaceWith(sortedRows[i-1]) : null );
 		
+		table.observer.observe(table.tBodies[0], {
+			childList: true,
+			subtree : true
+		});
+
 		this.sortEvent.detail.table = table;
 		document.dispatchEvent(this.sortEvent);		
 	}
