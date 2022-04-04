@@ -103,4 +103,13 @@ Configuration object example:
 		comparisonFunction = null // override the default comparison function for all tables
 	});
 
+Methods:
+
+```
+	startAutoSorting([tableClass])	-	will start automatically sorting tables with the provided class, the tableClass passed to the instantation options or the default
+	stopSorting([element])			-	will stop automatically sorting the provided element, all elements with the tableClass passed to the instantion options or the default
+	sortTable(tableElement, comparisonIndex, [comparisonFunction])
+									-	will immediately sort the data in the provided table using comparisonIndex as the column to sort by and using comparisonFunction if provided or the one passed to the instantion options or the default
+```
+
 😎
