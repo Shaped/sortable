@@ -5,6 +5,7 @@
 
 class Sortable {
 	constructor({
+		autoSort = true,
 		defaultSortDirection = 0,
 		sortNumeric = true,
 		sortByValue = false,
@@ -12,23 +13,26 @@ class Sortable {
 		comparisonFunction = null    	
 	} = {}) {
 		this.options = {
-			defaultSortDirection:defaultSortDirection,
-			sortNumeric:sortNumeric,
-			sortByValue:sortByValue,
-			tableClass:tableClass,
-			comparisonFunction:comparisonFunction
+			autoSort,
+			defaultSortDirection,
+			sortNumeric,
+			sortByValue,
+			tableClass,
+			comparisonFunction
 		};
 
 		this.sortEvent = new CustomEvent(`${this.options.tableClass}_sortEvent`, {
 			detail: { table : null }
 		});
 
-		this.initialize();
+		if (autoSort) this.startAutoSorting();
 	}
 
-	initialize(table = null) {
+	startAutoSorting(tableClass = null) {
+		if (tableClass == null) tableClass = this.options.tableClass;
+
 		Array.from(document.querySelectorAll("table")).forEach((tableElement,tableId) => 
-			(tableElement.classList.contains(this.options.tableClass)) ? (
+			(tableElement.classList.contains(tableClass)) ? (
 				this.startSorting(tableElement)
 			):null);
 	}
@@ -37,7 +41,7 @@ class Sortable {
 		if (typeof tableElement.sortDirection === 'undefined') 
 			tableElement.sortDirection = this.options.defaultSortDirection;
 
-		tableElement.observer = new MutationObserver(this.update.bind(this, tableElement));
+		tableElement.observer = new MutationObserver(this._update.bind(this, tableElement));
 
 		if (!tableElement.classList.contains(this.options.tableClass)) tableElement.classList.add(this.options.tableClass);
 
@@ -96,7 +100,7 @@ class Sortable {
 		}
 	}
 
-	update(element, mutations, observer) {
+	_update(element, mutations, observer) {
 		element.observer.disconnect();
 		this.sortTable(element, element?.lastSort);
 	}
@@ -163,7 +167,6 @@ class Sortable {
 				else return (x.innerHTML.toUpperCase() < y.innerHTML.toUpperCase()) ? 1 : -1;
 			}
 	}.bind(this)) {
-
 		table.lastSort = comparisonIndex;
 
 		var sortArray = [], sortedRows = [];
