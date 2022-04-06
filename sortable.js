@@ -1,5 +1,5 @@
 /*
-	sortable b2242 - easy sortable tables [compwnents]
+	sortable b2246 - easy sortable tables [compwnents]
 	(C) 2022 Shaped Technica (Jai B) || GPLv3 | Commercial License Available
 */
 
@@ -54,7 +54,7 @@ class Sortable {
 			tableElement.rows[0].cells[index].classList.add(`${this.options.tableClass}_desc`);
 
 		Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId) => {
-			Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId) => {
+			Array.from(tableRowElement.querySelectorAll('td, th')).forEach((tableCellElement,columnId) => {
 					(rowId == 0) ? tableCellElement.addEventListener('click', this.sortListener) : null;
 				}
 			)
@@ -72,7 +72,7 @@ class Sortable {
 
 							Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId) => 
 								(rowId == 0) 
-								?	Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId) => {
+								?	Array.from(tableRowElement.querySelectorAll('td, th')).forEach((tableCellElement,columnId) => {
 										tableCellElement.classList.remove(`${this.options.tableClass}_asc`);
 										tableCellElement.classList.remove(`${this.options.tableClass}_desc`);
 										tableCellElement.classList.remove(`${this.options.tableClass}_active`);
@@ -89,7 +89,7 @@ class Sortable {
 
 			Array.from(tableElement.querySelectorAll('tr')).forEach((tableRowElement,rowId) =>
 				(rowId == 0)
-				?	Array.from(tableRowElement.querySelectorAll('td')).forEach((tableCellElement,columnId) => {
+				?	Array.from(tableRowElement.querySelectorAll('td, th')).forEach((tableCellElement,columnId) => {
 						tableCellElement.classList.remove(`${this.options.tableClass}_asc`);
 						tableCellElement.classList.remove(`${this.options.tableClass}_desc`);
 						tableCellElement.classList.remove(`${this.options.tableClass}_active`);
@@ -125,21 +125,10 @@ class Sortable {
 				})() :
 				(table.lastSort == null) ? table.sortDirection = this.options.defaultSortDirection : null;
 			
-			Array.from(table.querySelectorAll(`.${this.options.tableClass}_active`)).forEach((el, i) =>
-				el.classList.remove(`${this.options.tableClass}_active`,
-									`${this.options.tableClass}_asc`,
-									`${this.options.tableClass}_desc`));
-
-			table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_active`);
-
-			(table.sortDirection) ?
-				table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_asc`) :
-				table.rows[0].cells[ev.target.cellIndex].classList.add(`${this.options.tableClass}_desc`);
-
 			this.sortTable(table, ev.target.cellIndex);
 		};
 
-		Object.defineProperty(this, 'sortListener',{ value : listener});
+		Object.defineProperty(this, 'sortListener',{ value : listener });
 
 	  return listener;
 	}
@@ -168,6 +157,17 @@ class Sortable {
 			}
 	}.bind(this)) {
 		table.lastSort = comparisonIndex;
+
+			Array.from(table.querySelectorAll(`.${this.options.tableClass}_active`)).forEach((el, i) =>
+				el.classList.remove(`${this.options.tableClass}_active`,
+									`${this.options.tableClass}_asc`,
+									`${this.options.tableClass}_desc`));
+
+			table.rows[0].cells[comparisonIndex].classList.add(`${this.options.tableClass}_active`);
+
+			(table.sortDirection) ?
+				table.rows[0].cells[comparisonIndex].classList.add(`${this.options.tableClass}_asc`) :
+				table.rows[0].cells[comparisonIndex].classList.add(`${this.options.tableClass}_desc`);
 
 		var sortArray = [], sortedRows = [];
 
