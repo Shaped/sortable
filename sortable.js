@@ -177,16 +177,29 @@ class Sortable {
 
 		sortArray = sortArray.sort(comparisonFunction);
 
-		sortArray.forEach((el,i) => sortedRows[i] = el.parentElement.cloneNode(true));
+		let parent=null;
+		if (typeof table.rows[1] !== 'undefined') {
+			parent = table.rows[1].parentElement;
+		} else {
+			parent = table;
+		}
 
-		Array.from(table.rows).forEach((el,i) => (i > 0) ? el.replaceWith(sortedRows[i-1]) : null );
-		
+		sortArray.forEach((el,i) => {
+			sortedRows[i] = el.parentElement.parentElement.removeChild(el.parentElement);
+		});
+
+		sortedRows.forEach((row) => {
+			parent.appendChild(row);
+		});
+
 		table.observer.observe(table.tBodies[0], {
 			childList: true,
 			subtree : true
 		});
 
 		this.sortEvent.detail.table = table;
-		document.dispatchEvent(this.sortEvent);		
+		document.dispatchEvent(this.sortEvent);
 	}
 }
+
+
