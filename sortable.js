@@ -37,6 +37,15 @@ class Sortable {
 			):null);
 	}
 
+	stopAutoSorting(tableClass = null) {
+		if (tableClass == null) tableClass = this.options.tableClass;
+
+		Array.from(document.querySelectorAll("table")).forEach((tableElement,tableId) => 
+			(tableElement.classList.contains(tableClass)) ? (
+				this.stopSorting(tableElement)
+			):null);
+	}
+
 	startSorting(tableElement, index = 0) {
 		if (typeof tableElement.sortDirection === 'undefined') 
 			tableElement.sortDirection = this.options.defaultSortDirection;
@@ -185,7 +194,8 @@ class Sortable {
 		}
 
 		sortArray.forEach((el,i) => {
-			sortedRows[i] = el.parentElement.parentElement.removeChild(el.parentElement);
+			// sortedRows[i] = el.parentElement.parentElement.removeChild(el.parentElement); ?
+			sortedRows[i] = parent.removeChild(el.parentElement);
 		});
 
 		sortedRows.forEach((row) => {
